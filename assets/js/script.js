@@ -5,8 +5,6 @@ const dateE1 = document.getElementById("date");
 const timeE1 = document.getElementById("time");
 const toggle = document.getElementById("toggle2");
 
-
-
 const days = [
   "Domingo",
   "Segunda",
@@ -31,10 +29,17 @@ const months = [
   "Dez",
 ];
 
-function isDayTime() {
+function getTimePeriod() {
   const currentTime = new Date();
   const hour = currentTime.getHours();
-  return hour >= 6 && hour < 18;
+
+  if (hour >= 6 && hour < 12) {
+    return "light";
+  } else if (hour >= 12 && hour < 18) {
+    return "afternoon";
+  } else {
+    return "dark";
+  }
 }
 
 function updateClock() {
@@ -45,10 +50,10 @@ function updateClock() {
   const hour = time.getHours();
   const minutes = time.getMinutes();
   const seconds = time.getSeconds();
-  const ampm = hour > 12 ? "PM" : "AM";
+  const formattedHour = hour.toString().padStart(2, "0"); // Formata o número das horas com dois dígitos
 
   dateE1.innerHTML = `${days[day]}, ${date} ${months[month]}`;
-  timeE1.innerHTML = `${hour}:${minutes < 10 ? `0${minutes}` : minutes} ${ampm}`;
+  timeE1.innerHTML = `${formattedHour}:${minutes < 10 ? `0${minutes}` : minutes}`;
 
   hoursE1.style.transform = `translate(-50%, -100%) rotateZ(${hour * 30}deg)`;
   minutesE1.style.transform = `translate(-50%, -100%) rotateZ(${minutes * 6}deg)`;
@@ -56,16 +61,19 @@ function updateClock() {
 
   const html = document.querySelector("html");
   const mode = document.querySelector(".mode");
+  const timePeriod = getTimePeriod();
 
-  if (isDayTime()) {
-    html.classList.remove("dark");
-    html.classList.add("light");
-    mode.innerHTML = "Dark Mode";
-    toggle.classList.remove("active");
-  } else {
-    html.classList.remove("light");
-    html.classList.add("dark");
+  html.classList.remove("light", "afternoon", "dark");
+  html.classList.add(timePeriod);
+  
+  if (timePeriod === "light") {
     mode.innerHTML = "Light Mode";
+    toggle.classList.remove("active");
+  } else if (timePeriod === "afternoon") {
+    mode.innerHTML = "Afternoon Mode";
+    toggle.classList.add("active");
+  } else {
+    mode.innerHTML = "Dark Mode";
     toggle.classList.add("active");
   }
 }
